@@ -20,5 +20,18 @@
   {
   "route": "/.auth/login/twitter",
   "statusCode": 404
-  }  
-]
+  },
+  
+    {
+      "route": "/*",
+      "allowedRoles": ["pedia"]
+    }
+  ],
+  "responseOverrides": {
+    "401": {
+      "statusCode": 302,
+      "redirect": "/.auth/login/aad"
+    }
+  }
+
+
