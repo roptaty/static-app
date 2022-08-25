@@ -69,8 +69,10 @@ namespace Waaler.Functions
             }
 
             var result = new ContentResult();
-            result.Content = "{" + System.Text.Json.JsonSerializer.Serialize(roles.ToArray()) + "}";
+            result.Content = "{" + System.Text.Json.JsonSerializer.Serialize(roles.ToArray()) + "}";            
             result.ContentType = "application/json";
+
+            log.LogInformation(result.ContentType + "   - " + result.Content);
 
             return result;
         }
