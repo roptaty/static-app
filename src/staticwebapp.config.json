@@ -1,4 +1,5 @@
-"auth": {
+{
+  "auth": {
   "rolesSource": "/api/GetRoles",
   "identityProviders": {
     "azureActiveDirectory": {
@@ -33,5 +34,4 @@
       "redirect": "/.auth/login/aad"
     }
   }
-
-
+}
