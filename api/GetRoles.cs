@@ -26,11 +26,17 @@ namespace Waaler.Functions
             public string AccessToken { get; set;}
         }
 
+        class RolesResult 
+        {
+            [System.Text.Json.Serialization.JsonPropertyName("roles")]
+            public string[] Roles { get; set; }
+
+        }
         
 
         [FunctionName("GetRoles")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
@@ -55,8 +61,7 @@ namespace Waaler.Functions
                 request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
                 await Task.FromResult<object>(null);
             }));
-
-            log.LogInformation("Getting transitivemember... for " + accessToken);
+            
             DirectoryObject directoryObject = await graphClient.Me.TransitiveMemberOf[PEDIA_GROUP_ID].Request().GetAsync();
             if (directoryObject != null) 
             {
@@ -68,13 +73,11 @@ namespace Waaler.Functions
                 log.LogInformation("No directoryObject");
             }
 
-            var result = new ContentResult();
-            result.Content = "{" + System.Text.Json.JsonSerializer.Serialize(roles.ToArray()) + "}";            
-            result.ContentType = "application/json";
+            
 
-            log.LogInformation(result.ContentType + "   - " + result.Content);
+            
 
-            return result;
+            return new JsonResult(new RolesResult { Roles = roles.ToArray() });
         }
 
         
