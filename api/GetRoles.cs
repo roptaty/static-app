@@ -26,6 +26,8 @@ namespace Waaler.Functions
             public string AccessToken { get; set;}
         }
 
+        
+
         [FunctionName("GetRoles")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
@@ -66,7 +68,11 @@ namespace Waaler.Functions
                 log.LogInformation("No directoryObject");
             }
 
-            return new JsonResult(roles); 
+            var result = new ContentResult();
+            result.Content = "{" + System.Text.Json.JsonSerializer.Serialize(roles.ToArray()) + "}";
+            result.ContentType = "application/json";
+
+            return result;
         }
 
         
