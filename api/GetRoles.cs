@@ -20,26 +20,26 @@ namespace Waaler.Functions
     {
         public static string PEDIA_GROUP_ID = "bdc6799a-489f-4dfb-978a-0026190ddafd";
         public static string ROLE_NAME = "pedia";
-        class RequestBody 
+        class RequestBody
         {
             [System.Text.Json.Serialization.JsonPropertyName("accessToken")]
-            public string AccessToken { get; set;}
+            public string AccessToken { get; set; }
         }
 
-        class RolesResult 
+        class RolesResult
         {
             [System.Text.Json.Serialization.JsonPropertyName("roles")]
             public string[] Roles { get; set; }
 
         }
-        
+
 
         [FunctionName("GetRoles")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation("GetRoles are triggered");
             List<string> roles = new List<string>();
             using StreamReader sr = new StreamReader(req.Body);
             var requestBody = System.Text.Json.JsonSerializer.Deserialize<RequestBody>(sr.ReadToEnd());
@@ -50,37 +50,40 @@ namespace Waaler.Functions
                 return new JsonResult(roles);
             }
 
-            
-            
-            // parse the body of req
-            // get the accessTOken
-            string accessToken = requestBody.AccessToken;
 
-
-            var graphClient = new GraphServiceClient(new DelegateAuthenticationProvider(async (request) => {
-                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
-                await Task.FromResult<object>(null);
-            }));
-            
-            DirectoryObject directoryObject = await graphClient.Me.TransitiveMemberOf[PEDIA_GROUP_ID].Request().GetAsync();
-            if (directoryObject != null) 
+            try
             {
-                log.LogInformation("Adding pedia");
-                roles.Add(ROLE_NAME);
+                // parse the body of req
+                // get the accessTOken
+                string accessToken = requestBody.AccessToken;
+
+
+                var graphClient = new GraphServiceClient(new DelegateAuthenticationProvider(async (request) =>
+                {
+                    request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+                    await Task.FromResult<object>(null);
+                }));
+
+                DirectoryObject directoryObject = await graphClient.Me.TransitiveMemberOf[PEDIA_GROUP_ID].Request().GetAsync();
+                if (directoryObject != null)
+                {
+                    log.LogInformation("Adding pedia");
+                    roles.Add(ROLE_NAME);
+                }
+                else
+                {
+                    log.LogInformation("No directoryObject");
+                }
             }
-            else 
+            catch (Exception ex)
             {
-                log.LogInformation("No directoryObject");
+                log.LogInformation("Exception when querying for groups: " + ex.Message);
             }
-
-            
-
-            
 
             return new JsonResult(new RolesResult { Roles = roles.ToArray() });
         }
 
-        
+
     }
 
 
