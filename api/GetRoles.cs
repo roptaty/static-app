@@ -19,16 +19,16 @@ namespace Waaler.Functions
     public static class GetRoles
     {
         public static string PEDIA_GROUP_ID = "bdc6799a-489f-4dfb-978a-0026190ddafd";
-        public static string ROLE_NAME = "Pedia";
+        public static string ROLE_NAME = "pedia";
         class RequestBody 
         {
-            [JsonProperty("accessToken")]
+            [System.Text.Json.Serialization.JsonPropertyName("accessToken")]
             public string AccessToken { get; set;}
         }
 
         [FunctionName("GetRoles")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
