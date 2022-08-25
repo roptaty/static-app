@@ -64,15 +64,15 @@ namespace Waaler.Functions
                     await Task.FromResult<object>(null);
                 }));
 
-                DirectoryObject directoryObject = await graphClient.Me.TransitiveMemberOf[PEDIA_GROUP_ID].Request().GetAsync();
-                if (directoryObject != null)
+                var pageCollection = await graphClient.Me.GetMemberGroups().Request().Filter($"$id eq {PEDIA_GROUP_ID}").PostAsync();
+                if (pageCollection.Any())
                 {
                     log.LogInformation("Adding pedia");
                     roles.Add(ROLE_NAME);
                 }
                 else
                 {
-                    log.LogInformation("No directoryObject");
+                    log.LogInformation("No membership...");
                 }
             }
             catch (Exception ex)
